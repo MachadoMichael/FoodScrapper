@@ -29,6 +29,7 @@ builder.Services.AddDbContext<FoodDbContext>(options =>
 
 // Adiciona seus serviços
 builder.Services.AddScoped<FoodService>();
+builder.Services.AddScoped<ComponentService>();
 
 // Configuração do Swagger
 builder.Services.AddEndpointsApiExplorer();

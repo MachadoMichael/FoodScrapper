@@ -34,3 +34,18 @@ x. instalar o package para ter o swagger funcionando
 ```
 dotnet add package Swashbuckle.AspNetCore
 ```
+
+curl -X POST http://localhost:4000/api/components \
+-H "Content-Type: application/json" \
+-d '{
+    "name": "Vitamin C",
+    "units": "mg",
+    "valuePer100g": 50.0,
+    "standardDeviation": "5",
+    "minValue": 45.0,
+    "maxValue": 55.0,
+    "numberOfDataUsed": 10,
+    "references": "Nutritional Database",
+    "dataType": "Calculated",
+    "foodId": 1 // Substitua pelo ID do Food que você criou
+}'
