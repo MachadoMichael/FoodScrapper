@@ -1,12 +1,12 @@
-using YourNamespace.Models; // Adjust the namespace according to your project structure
-using YourNamespace.Services; // Adjust the namespace according to your project structure
+using FoodScrapper.Models;
+using FoodScrapper.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace YourNamespace.Controllers
+namespace FoodScrapper.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/foods")]
     [ApiController]
     public class FoodController : ControllerBase
     {
@@ -103,10 +103,10 @@ namespace YourNamespace.Controllers
                 await _foodService.UpdateAsync(food);
                 return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException e)
             {
                 return NotFound(new { 
-                    SystemMessage = "Food not found.", 
+                    SystemMessage = e.Message, 
                     UserMessage = "The food item you are trying to update does not exist." 
                 });
             }

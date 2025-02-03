@@ -1,10 +1,10 @@
-using YourNamespace.Data; // Adjust the namespace according to your project structure
-using YourNamespace.Models; // Adjust the namespace according to your project structure
+using FoodScrapper.Infra.Database;
+using FoodScrapper.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace YourNamespace.Services
+namespace FoodScrapper.Services
 {
     public class FoodService
     {

@@ -1,4 +1,4 @@
-namespace YourNamespace.Models
+namespace FoodScrapper.Models
 {
     public class Food
     {

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using YourNamespace.Models;
+using FoodScrapper.Models;
 
-namespace YourNamespace.Data
+namespace FoodScrapper.Infra.Database
 {
     public class FoodDbContext : DbContext
     {
