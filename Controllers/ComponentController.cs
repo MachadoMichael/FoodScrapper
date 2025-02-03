@@ -157,5 +157,26 @@ namespace FoodScrapper.Controllers
                 });
             }
         }
+
+        // DELETE: api/components/deleteall
+        [HttpDelete("deleteAll")]
+        public async Task<IActionResult> DeleteAll()
+        {
+            try
+            {
+                await _componentService.DeleteAllAsync();
+                return Ok(new { 
+                    SystemMessage = "All components have been deleted successfully.", 
+                    UserMessage = "All component data has been removed from the database." 
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { 
+                    SystemMessage = ex.Message, 
+                    UserMessage = "An error occurred while deleting the components." 
+                });
+            }
+        }
     }
 }

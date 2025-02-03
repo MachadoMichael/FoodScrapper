@@ -55,5 +55,40 @@ namespace FoodScrapper.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public DataType GetDataTypeFromText(string text)
+        {
+            var dataTypeMap = new Dictionary<string, DataType>
+        {
+            { "Analítico", DataType.Analytical },
+            { "Calculado", DataType.Calculated },
+            { "Assumido", DataType.Assumed }
+        };
+
+            if (dataTypeMap.TryGetValue(text, out DataType dataType))
+            {
+                return dataType;
+            }
+
+            // Try to parse the input text directly as enum if not found in dictionary
+            if (Enum.TryParse<DataType>(text, true, out DataType result))
+            {
+                return result;
+            }
+
+            return DataType.Assumed; // Default value if text is not found and can't be parsed
+        }
+
+        // Método para apagar todos os Components
+        public async Task DeleteAllAsync()
+        {
+            // Busca todos os Components
+            var components = await _context.Components.ToListAsync();
+            if (components.Count > 0)
+            {
+                _context.Components.RemoveRange(components); // Remove todos os Components
+                await _context.SaveChangesAsync(); // Salva as alterações no banco de dados
+            }
+        }
     }
 }

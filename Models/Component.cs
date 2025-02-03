@@ -26,5 +26,7 @@ namespace FoodScrapper.Models
         Analytical,
         Assumed
     }
+
+
 }
 
