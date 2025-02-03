@@ -55,5 +55,15 @@ namespace FoodScrapper.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+    // Delete All and Reset Identity
+    public async Task DeleteAllAsync()
+    {
+        _context.Foods.RemoveRange(_context.Foods);
+        await _context.SaveChangesAsync();
+        
+        // Reset identity/sequence to 1
+        await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Foods\" RESTART IDENTITY CASCADE");
+    }
     }
 }

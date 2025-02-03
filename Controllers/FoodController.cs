@@ -143,5 +143,26 @@ namespace FoodScrapper.Controllers
                 });
             }
         }
+
+        // DELETE: api/food/deleteAll
+        [HttpDelete("deleteAll")]
+        public async Task<IActionResult> DeleteAll()
+        {
+            try
+            {
+                await _foodService.DeleteAllAsync();
+                return Ok(new { 
+                    SystemMessage = "All food items deleted successfully.", 
+                    UserMessage = "All food items have been deleted from the database." 
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { 
+                    SystemMessage = ex.Message, 
+                    UserMessage = "An error occurred while deleting all food items." 
+                });
+            }
+        }
     }
 }
