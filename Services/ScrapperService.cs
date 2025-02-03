@@ -27,6 +27,7 @@ public class ScrapperService
     {
         int pageNumber = 1;
         bool hasMoreData = true;
+        var foodsToSave = new List<Food>(); // Lista para armazenar os alimentos
 
         while (hasMoreData)
         {
@@ -59,13 +60,15 @@ public class ScrapperService
                         Brand = columns[4].InnerText.Trim()
                     };
 
-                    // Salva o Food no banco de dados usando o FoodService
-                    await _foodService.CreateAsync(food);
+                    foodsToSave.Add(food); // Adiciona o Food à lista
                 }
             }
 
             pageNumber++; // Incrementa o número da página para a próxima iteração
         }
+
+        // Salva todos os Foods no banco de dados de uma só vez
+        await _foodService.CreateRangeAsync(foodsToSave); // Método para salvar em massa
 
         // Após o loop, você pode retornar uma mensagem de sucesso
         Console.WriteLine("Scraping completed successfully."); // Log para depuração
@@ -75,6 +78,7 @@ public class ScrapperService
     {
         // Busca todas as Foods do banco de dados
         var foods = await _foodService.GetAllAsync();
+        var componentsToSave = new List<Component>(); // Lista para armazenar os componentes
 
         foreach (var food in foods)
         {
@@ -109,8 +113,7 @@ public class ScrapperService
                             FoodId = food.Id // Vincula o Component ao Food
                         };
 
-                        // Salva o Component no banco de dados usando o ComponentService
-                        await _componentService.CreateAsync(component);
+                        componentsToSave.Add(component); // Adiciona o Component à lista
                     }
                     catch (FormatException ex)
                     {
@@ -120,6 +123,9 @@ public class ScrapperService
                 }
             }
         }
+
+        // Salva todos os Components no banco de dados de uma só vez
+        await _componentService.CreateRangeAsync(componentsToSave); // Método para salvar em massa
     }
 
 }

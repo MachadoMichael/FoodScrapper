@@ -82,13 +82,18 @@ namespace FoodScrapper.Services
         // Método para apagar todos os Components
         public async Task DeleteAllAsync()
         {
-            // Busca todos os Components
-            var components = await _context.Components.ToListAsync();
-            if (components.Count > 0)
-            {
-                _context.Components.RemoveRange(components); // Remove todos os Components
-                await _context.SaveChangesAsync(); // Salva as alterações no banco de dados
-            }
+            _context.Components.RemoveRange(_context.Components);
+            await _context.SaveChangesAsync();
+
+            // Reset identity/sequence to 1
+            await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Components\" RESTART IDENTITY CASCADE");
+        }
+
+        // Método para salvar uma lista de Components
+        public async Task CreateRangeAsync(List<Component> components)
+        {
+            await _context.Components.AddRangeAsync(components); // Adiciona todos os Components à lista
+            await _context.SaveChangesAsync(); // Salva as alterações no banco de dados
         }
     }
 }
