@@ -28,18 +28,20 @@ namespace FoodScrapper.Controllers
             {
                 if (componentDto == null || componentDto.FoodId <= 0)
                 {
-                    return BadRequest(new { 
-                        SystemMessage = "Invalid input.", 
-                        UserMessage = "Please provide valid component data and a valid Food ID." 
+                    return BadRequest(new
+                    {
+                        SystemMessage = "Invalid input.",
+                        UserMessage = "Please provide valid component data and a valid Food ID."
                     });
                 }
 
                 var food = await _foodService.GetByIdAsync(componentDto.FoodId);
                 if (food == null)
                 {
-                    return BadRequest(new { 
-                        SystemMessage = "Invalid Food ID.", 
-                        UserMessage = "The specified Food does not exist." 
+                    return BadRequest(new
+                    {
+                        SystemMessage = "Invalid Food ID.",
+                        UserMessage = "The specified Food does not exist."
                     });
                 }
 
@@ -50,9 +52,10 @@ namespace FoodScrapper.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { 
-                    SystemMessage = ex.Message, 
-                    UserMessage = "An error occurred while creating the component." 
+                return StatusCode(500, new
+                {
+                    SystemMessage = ex.Message,
+                    UserMessage = "An error occurred while creating the component."
                 });
             }
         }
@@ -68,9 +71,10 @@ namespace FoodScrapper.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { 
-                    SystemMessage = ex.Message, 
-                    UserMessage = "An error occurred while retrieving components." 
+                return StatusCode(500, new
+                {
+                    SystemMessage = ex.Message,
+                    UserMessage = "An error occurred while retrieving components."
                 });
             }
         }
@@ -84,18 +88,20 @@ namespace FoodScrapper.Controllers
                 var component = await _componentService.GetByIdAsync(id);
                 if (component == null)
                 {
-                    return NotFound(new { 
-                        SystemMessage = "Component not found.", 
-                        UserMessage = "The requested component does not exist." 
+                    return NotFound(new
+                    {
+                        SystemMessage = "Component not found.",
+                        UserMessage = "The requested component does not exist."
                     });
                 }
                 return Ok(component);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { 
-                    SystemMessage = ex.Message, 
-                    UserMessage = "An error occurred while retrieving the component." 
+                return StatusCode(500, new
+                {
+                    SystemMessage = ex.Message,
+                    UserMessage = "An error occurred while retrieving the component."
                 });
             }
         }
@@ -108,9 +114,10 @@ namespace FoodScrapper.Controllers
             {
                 if (id != component.Id)
                 {
-                    return BadRequest(new { 
-                        SystemMessage = "ID mismatch.", 
-                        UserMessage = "The provided ID does not match the component." 
+                    return BadRequest(new
+                    {
+                        SystemMessage = "ID mismatch.",
+                        UserMessage = "The provided ID does not match the component."
                     });
                 }
 
@@ -119,16 +126,18 @@ namespace FoodScrapper.Controllers
             }
             catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException e)
             {
-                return NotFound(new { 
-                    SystemMessage = e.Message, 
-                    UserMessage = "The component you are trying to update does not exist." 
+                return NotFound(new
+                {
+                    SystemMessage = e.Message,
+                    UserMessage = "The component you are trying to update does not exist."
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { 
-                    SystemMessage = ex.Message, 
-                    UserMessage = "An error occurred while updating the component." 
+                return StatusCode(500, new
+                {
+                    SystemMessage = ex.Message,
+                    UserMessage = "An error occurred while updating the component."
                 });
             }
         }
@@ -142,18 +151,20 @@ namespace FoodScrapper.Controllers
                 var result = await _componentService.DeleteAsync(id);
                 if (!result)
                 {
-                    return NotFound(new { 
-                        SystemMessage = "Component not found.", 
-                        UserMessage = "The component you are trying to delete does not exist." 
+                    return NotFound(new
+                    {
+                        SystemMessage = "Component not found.",
+                        UserMessage = "The component you are trying to delete does not exist."
                     });
                 }
                 return NoContent();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { 
-                    SystemMessage = ex.Message, 
-                    UserMessage = "An error occurred while deleting the component." 
+                return StatusCode(500, new
+                {
+                    SystemMessage = ex.Message,
+                    UserMessage = "An error occurred while deleting the component."
                 });
             }
         }
@@ -165,18 +176,40 @@ namespace FoodScrapper.Controllers
             try
             {
                 await _componentService.DeleteAllAsync();
-                return Ok(new { 
-                    SystemMessage = "All components have been deleted successfully.", 
-                    UserMessage = "All component data has been removed from the database." 
+                return Ok(new
+                {
+                    SystemMessage = "All components have been deleted successfully.",
+                    UserMessage = "All component data has been removed from the database."
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { 
-                    SystemMessage = ex.Message, 
-                    UserMessage = "An error occurred while deleting the components." 
+                return StatusCode(500, new
+                {
+                    SystemMessage = ex.Message,
+                    UserMessage = "An error occurred while deleting the components."
+                });
+            }
+        }
+
+        // GET: api/components/food/{foodId}
+        [HttpGet("food/{foodId}")]
+        public async Task<ActionResult<List<Component>>> GetByFoodId(int foodId)
+        {
+            try
+            {
+                var components = await _componentService.GetByFoodIdAsync(foodId);
+                return Ok(components);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    SystemMessage = ex.Message,
+                    UserMessage = "An error occurred while retrieving components for the specified food."
                 });
             }
         }
     }
 }
+

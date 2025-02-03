@@ -95,5 +95,13 @@ namespace FoodScrapper.Services
             await _context.Components.AddRangeAsync(components); // Adiciona todos os Components à lista
             await _context.SaveChangesAsync(); // Salva as alterações no banco de dados
         }
+
+        // Get all Components by FoodId
+        public async Task<List<Component>> GetByFoodIdAsync(int foodId)
+        {
+            return await _context.Components
+                .Where(c => c.FoodId == foodId)
+                .ToListAsync();
+        }
     }
 }
