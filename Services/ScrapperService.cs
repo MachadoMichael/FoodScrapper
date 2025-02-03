@@ -15,40 +15,60 @@ public class ScrapperService
 
     public ScrapperService(FoodService foodService, ComponentService componentService)
     {
-        _httpClient = new HttpClient();
+        _httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromMinutes(5) // Aumenta o timeout para 5 minutos
+        };
         _foodService = foodService; // Inicializando FoodService
         _componentService = componentService; // Inicializando ComponentService
     }
 
-    public async Task ScrapeFoodDataAsync(int pageNumber)
+    public async Task ScrapeFoodDataAsync()
     {
-        var url = $"https://www.tbca.net.br/base-dados/composicao_estatistica.php?pagina={pageNumber}&atuald=1#";
-        var response = await _httpClient.GetStringAsync(url);
-        var htmlDocument = new HtmlDocument();
-        htmlDocument.LoadHtml(response);
+        int pageNumber = 1;
+        bool hasMoreData = true;
 
-        // Seleciona a tabela que contém os dados
-        var table = htmlDocument.DocumentNode.SelectSingleNode("//table"); // Ajuste o XPath conforme necessário
-        var rows = table.SelectNodes(".//tr");
-
-        foreach (var row in rows)
+        while (hasMoreData)
         {
-            var columns = row.SelectNodes(".//td");
-            if (columns != null && columns.Count >= 5) // Verifica se há colunas suficientes
-            {
-                var food = new Food
-                {
-                    Code = columns[0].InnerText.Trim(),
-                    Name = columns[1].InnerText.Trim(),
-                    ScientificName = columns[2].InnerText.Trim(),
-                    Group = columns[3].InnerText.Trim(),
-                    Brand = columns[4].InnerText.Trim()
-                };
+            var url = $"https://www.tbca.net.br/base-dados/composicao_estatistica.php?pagina={pageNumber}&atuald=1#";
+            var response = await _httpClient.GetStringAsync(url);
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(response);
 
-                // Salva o Food no banco de dados usando o FoodService
-                await _foodService.CreateAsync(food);
+            // Seleciona a tabela que contém os dados
+            var table = htmlDocument.DocumentNode.SelectSingleNode("//table"); // Ajuste o XPath conforme necessário
+            var rows = table.SelectNodes(".//tr");
+
+            if (rows == null || rows.Count <= 1) // Se não houver linhas ou apenas o cabeçalho
+            {
+                hasMoreData = false; // Não há mais dados para processar
+                break; // Sai do loop
             }
+
+            foreach (var row in rows)
+            {
+                var columns = row.SelectNodes(".//td");
+                if (columns != null && columns.Count >= 5) // Verifica se há colunas suficientes
+                {
+                    var food = new Food
+                    {
+                        Code = columns[0].InnerText.Trim(),
+                        Name = columns[1].InnerText.Trim(),
+                        ScientificName = columns[2].InnerText.Trim(),
+                        Group = columns[3].InnerText.Trim(),
+                        Brand = columns[4].InnerText.Trim()
+                    };
+
+                    // Salva o Food no banco de dados usando o FoodService
+                    await _foodService.CreateAsync(food);
+                }
+            }
+
+            pageNumber++; // Incrementa o número da página para a próxima iteração
         }
+
+        // Após o loop, você pode retornar uma mensagem de sucesso
+        Console.WriteLine("Scraping completed successfully."); // Log para depuração
     }
 
     public async Task ScrapeComponentsForFoodsAsync()

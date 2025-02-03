@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using FoodScrapper.Infra.Database; 
 using Microsoft.OpenApi.Models;
 using FoodScrapper.Services;
-
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +26,12 @@ builder.Services.AddSwaggerGen();
 // Configuração do Entity Framework Core com PostgreSQL
 builder.Services.AddDbContext<FoodDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("FoodDatabase")));
+
+// Configuração do HttpClient com timeout
+builder.Services.AddHttpClient<ScrapperService>(client =>
+{
+    client.Timeout = TimeSpan.FromMinutes(5); // Aumenta o timeout para 5 minutos
+});
 
 // Adiciona seus serviços
 builder.Services.AddScoped<FoodService>();

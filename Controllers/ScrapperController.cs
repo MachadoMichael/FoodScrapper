@@ -15,13 +15,12 @@ namespace FoodScrapper.Controllers
             _scrapperService = scrapperService;
         }
 
-        // POST: api/scrapper/scrape
         [HttpPost("foods")]
-        public async Task<IActionResult> Scrape(int pageNumber = 1)
+        public async Task<IActionResult> Scrape()
         {
             try
             {
-                await _scrapperService.ScrapeFoodDataAsync(pageNumber);
+                await _scrapperService.ScrapeFoodDataAsync();
                 return Ok(new { 
                     SystemMessage = "Scraping completed successfully.", 
                     UserMessage = "Food data has been scraped and saved to the database." 
