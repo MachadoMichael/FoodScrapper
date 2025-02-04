@@ -67,5 +67,35 @@ namespace FoodScrapper.Controllers
                 });
             }
         }
+
+
+         [HttpPost("components/{foodId}")]
+        public async Task<IActionResult> ScrapeComponentsForFood(int foodId)
+        {
+            try
+            {
+                Console.WriteLine($"Scraping components for food ID {foodId}");
+                await _scrapperService.ScrapeComponentsForFood(foodId);
+                return Ok(new { 
+                    SystemMessage = $"Components for food ID {foodId} scraped successfully.", 
+                    UserMessage = "Component data has been scraped and saved to the database." 
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new {
+                    SystemMessage = ex.Message,
+                    UserMessage = "The specified food was not found."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { 
+                    SystemMessage = ex.Message, 
+                    UserMessage = "An error occurred while scraping the component data." 
+                });
+            }
+        }
     }
+       
 }

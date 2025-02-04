@@ -7,7 +7,7 @@ namespace FoodScrapper.Models
         public int Id { get; set; } // Primary key
         public string Name { get; set; } // Nome
         public string Units { get; set; } // Unidades
-        public float ValuePer100g { get; set; } // Valor por 100g
+        public float? ValuePer100g { get; set; } // Valor por 100g
         public string StandardDeviation { get; set; } // Desvio padrão
         public float? MinValue { get; set; } // Valor mínimo (nullable)
         public float? MaxValue { get; set; } // Valor máximo (nullable)

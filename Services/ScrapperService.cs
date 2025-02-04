@@ -128,5 +128,61 @@ public class ScrapperService
         await _componentService.CreateRangeAsync(componentsToSave); // Método para salvar em massa
     }
 
+
+public async Task ScrapeComponentsForFood(int foodId)
+{
+    var food = await _foodService.GetByIdAsync(foodId);
+    if (food == null)
+    {
+        throw new ArgumentException($"Food with ID {foodId} not found");
+    }
+
+    var componentsToSave = new List<Component>();
+    
+    var url = $"https://www.tbca.net.br/base-dados/int_composicao_estatistica.php?cod_produto={food.Code}";
+    var response = await _httpClient.GetStringAsync(url);
+    var htmlDocument = new HtmlDocument();
+    htmlDocument.LoadHtml(response);
+
+    // Seleciona a tabela que contém os dados dos componentes
+    var componentTable = htmlDocument.DocumentNode.SelectSingleNode("//table");
+    var componentRows = componentTable.SelectNodes(".//tr");
+
+    foreach (var componentRow in componentRows)
+    {
+        var componentColumns = componentRow.SelectNodes(".//td");
+        if (componentColumns != null && componentColumns.Count >= 8)
+        {
+            try
+            {
+                var component = new Component
+                {
+                    Name = componentColumns[0].InnerText.Trim(),
+                    Units = componentColumns[1].InnerText.Trim(),
+                    ValuePer100g = float.TryParse(componentColumns[2].InnerText?.Trim().Replace(",", "."), out float value) ? value : null,
+                    StandardDeviation = componentColumns[3].InnerText.Trim(),
+                    MinValue = float.TryParse(componentColumns[4].InnerText?.Trim().Replace(",", "."), out float minValue) ? minValue : null,
+                    MaxValue = float.TryParse(componentColumns[5].InnerText?.Trim().Replace(",", "."), out float maxValue) ? maxValue : null,
+                    NumberOfDataUsed = int.TryParse(componentColumns[6].InnerText?.Trim(), out int numData) ? numData : null,
+                    References = componentColumns[7].InnerText.Trim(),
+                    DataType = _componentService.GetDataTypeFromText(componentColumns[8].InnerText.Trim()),
+                    FoodId = foodId
+                };
+
+                componentsToSave.Add(component);
+            }
+            catch (FormatException ex)
+            {
+                var currentField = "";
+                var errorMessage = ex.Message;
+                var propertyName = errorMessage.Split(' ')[1]; // Gets the property name from the error message
+                Console.WriteLine($"Error parsing component data for Food ID {foodId} in field {propertyName}: {errorMessage}");
+            }
+        }
+    }
+
+    await _componentService.CreateRangeAsync(componentsToSave);
+}
+
 }
 
